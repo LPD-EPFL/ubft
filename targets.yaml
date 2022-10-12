@@ -1,0 +1,16 @@
+shared : []
+extern : []
+third-party : []
+crash-consensus : []
+
+memstore : [shared, extern]
+
+ctrl : [shared, extern, memory]
+conn : [shared, ctrl, memstore, third-party]
+crypto : [shared, memstore]
+special : [third-party, shared]
+memory : [special, shared]
+rpc : [shared]
+
+ubft : [shared, crypto, ctrl, conn, extern, memstore, third-party, rpc]
+ubft-apps : [shared, memstore, ctrl, rpc, third-party, crash-consensus, ubft]

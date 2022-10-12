@@ -1,0 +1,40 @@
+diff --git a/crash-consensus/src/leader-switch.hpp b/crash-consensus/src/leader-switch.hpp
+index dfe02ba..150a3f5 100644
+--- a/crash-consensus/src/leader-switch.hpp
++++ b/crash-consensus/src/leader-switch.hpp
+@@ -26,6 +26,15 @@
+ #include "contexted-poller.hpp"
+ 
+ namespace dory {
++static void little_sleep(std::chrono::microseconds us)
++{
++  auto start = std::chrono::steady_clock::now();
++  auto end = start + us;
++  do {
++      // std::this_thread::yield();
++  } while (std::chrono::steady_clock::now() < end);
++}
++
+ class LeaderHeartbeat {
+  private:
+   // static constexpr std::chrono::nanoseconds heartbeatRefreshRate =
+@@ -197,7 +206,8 @@ class LeaderHeartbeat {
+     if (leader_pid() == ctx->cc.my_id) {
+       want_leader.store(true);
+     } else {
+-      std::this_thread::sleep_for(std::chrono::microseconds(3));
++      // std::this_thread::sleep_for(std::chrono::microseconds(3));
++      little_sleep(std::chrono::microseconds(3));
+       // std::this_thread::sleep_for(std::chrono::milliseconds(500));
+     }
+   }
+@@ -944,7 +954,8 @@ class LeaderElection {
+ 
+         prev_command = current_command;
+ 
+-        std::this_thread::sleep_for(std::chrono::microseconds(1));
++        little_sleep(std::chrono::microseconds(1));
++        // std::this_thread::sleep_for(std::chrono::microseconds(1));
+ 
+         // if (i == 0) {
+         //   if (ftr.wait_for(std::chrono::seconds(0)) !=

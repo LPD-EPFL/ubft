@@ -1,0 +1,35 @@
+diff --git a/crash-consensus/src/config.hpp b/crash-consensus/src/config.hpp
+index 24fc6ab..c24a5d4 100644
+--- a/crash-consensus/src/config.hpp
++++ b/crash-consensus/src/config.hpp
+@@ -11,20 +11,20 @@ static const char heartbeatThreadName[] = "thd_heartbeat";
+ static const char followerThreadName[] = "thd_follower";
+ static const char fileWatcherThreadName[] = "thd_filewatcher";
+ 
+-static constexpr int handoverThreadBankAB_ID = 0;
+-static constexpr int fileWatcherThreadBankAB_ID = 10;
++static constexpr int handoverThreadBankAB_ID = 24;
++static constexpr int fileWatcherThreadBankAB_ID = 28;
+ 
+-static constexpr int consensusThreadBankA_ID = 2;
+-static constexpr int consensusThreadBankB_ID = 12;
++static constexpr int consensusThreadBankA_ID = 8;
++static constexpr int consensusThreadBankB_ID = -1;
+ 
+-static constexpr int switcherThreadBankA_ID = 4;
+-static constexpr int switcherThreadBankB_ID = 14;
++static constexpr int switcherThreadBankA_ID = 10;
++static constexpr int switcherThreadBankB_ID = -1;
+ 
+-static constexpr int heartbeatThreadBankA_ID = 6;
+-static constexpr int heartbeatThreadBankB_ID = 16;
++static constexpr int heartbeatThreadBankA_ID = 26;
++static constexpr int heartbeatThreadBankB_ID = -1;
+ 
+-static constexpr int followerThreadBankA_ID = 8;
+-static constexpr int followerThreadBankB_ID = 18;
++static constexpr int followerThreadBankA_ID = 12;
++static constexpr int followerThreadBankB_ID = -1;
+ 
+ struct ThreadConfig {
+   ThreadConfig()

@@ -1,0 +1,36 @@
+diff --git a/crash-consensus/src/crash-consensus.cpp b/crash-consensus/src/crash-consensus.cpp
+index 468d220..d6e0ad0 100644
+--- a/crash-consensus/src/crash-consensus.cpp
++++ b/crash-consensus/src/crash-consensus.cpp
+@@ -30,12 +30,12 @@ Consensus::Consensus(int my_id, std::vector<int> &remote_ids,
+ Consensus::~Consensus() {}
+ 
+ void Consensus::commitHandler(
+-    std::function<void(bool leader, uint8_t *buf, size_t len)> committer) {
++    std::function<void(bool leader, uint8_t const* const buf, size_t len)> committer) {
+   impl->commitHandler(committer);
+ }
+ 
+-ProposeError Consensus::propose(uint8_t *buf, size_t len) {
+-  int ret = impl->propose(buf, len);
++ProposeError Consensus::propose(uint8_t const * const buf, size_t len) {
++  int ret = impl->propose(const_cast<uint8_t *>(buf), len);
+   return static_cast<ProposeError>(ret);
+ }
+ 
+diff --git a/crash-consensus/src/crash-consensus.hpp b/crash-consensus/src/crash-consensus.hpp
+index 7f6d26a..3958ae6 100644
+--- a/crash-consensus/src/crash-consensus.hpp
++++ b/crash-consensus/src/crash-consensus.hpp
+@@ -33,9 +33,9 @@ class Consensus {
+   ~Consensus();
+ 
+   void commitHandler(
+-      std::function<void(bool leader, uint8_t *buf, size_t len)> committer);
++      std::function<void(bool leader, uint8_t const *const buf, size_t len)> committer);
+ 
+-  ProposeError propose(uint8_t *buf, size_t len);
++  ProposeError propose(uint8_t const * const buf, size_t len);
+   int potentialLeader();
+   bool blockedResponse();
+   std::pair<uint64_t, uint64_t> proposedReplicatedRange();

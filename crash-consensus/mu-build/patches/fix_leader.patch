@@ -1,0 +1,33 @@
+diff --git a/crash-consensus/src/leader-switch.hpp b/crash-consensus/src/leader-switch.hpp
+index 150a3f5..5d29b17 100644
+--- a/crash-consensus/src/leader-switch.hpp
++++ b/crash-consensus/src/leader-switch.hpp
+@@ -1,5 +1,7 @@
+ #pragma once
+ 
++#include <algorithm>
++
+ #include "error.hpp"
+ #include "log.hpp"
+ #include "message-identifier.hpp"
+@@ -245,18 +247,8 @@ class LeaderHeartbeat {
+ 
+  private:
+   int leader_pid() {
+-    int leader_id = -1;
+-
+-    for (auto &pid : ids) {
+-      // std::cout << pid << " " << status[pid].consecutive_updates <<
+-      // std::endl;
+-      if (status[pid].consecutive_updates > 2) {
+-        leader_id = pid;
+-        break;
+-      }
+-    }
+-
+-    return leader_id;
++    // Fix the leader to the process with the lowest id.
++    return *std::min_element(ids.begin(), ids.end());
+   }
+ 
+   LeaderContext *ctx;
