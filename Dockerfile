@@ -1,5 +1,14 @@
 From ubuntu:focal
 
+# Update packages and setup timezone
+RUN apt-get update && apt-get -y upgrade && \
+      apt-get -y install apt-utils tzdata
+
+ENV TZ=Europe/Zurich
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+      echo $TZ > /etc/timezone
+RUN dpkg-reconfigure --frontend=noninteractive tzdata
+
 # Update container
 RUN apt-get update && apt-get -y upgrade
 
