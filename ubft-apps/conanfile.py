@@ -22,6 +22,7 @@ class DoryUbftApps(ConanFile):
         "shared": [True, False],
         "log_level": ["TRACE", "DEBUG", "INFO", "WARN", "ERROR", "CRITICAL", "OFF"],
         "lto": [True, False],
+        "with_mu": [True, False],
     }
     default_options = {
         "shared": False,
@@ -30,6 +31,7 @@ class DoryUbftApps(ConanFile):
         "dory-conn:log_level": "INFO",
         "dory-crypto:log_level": "INFO",
         "lto": True,
+        "with_mu": False,
     }
     generators = "cmake"
     exports_sources = "src/*"
@@ -46,7 +48,8 @@ class DoryUbftApps(ConanFile):
         self.requires("dory-extern/0.0.1")
         self.requires("dory-rpc/0.0.1")
         self.requires("dory-third-party/0.0.1")
-        self.requires("dory-crash-consensus/0.0.1")
+        if self.options.with_mu:
+            self.requires("dory-crash-consensus/0.0.1")
         self.requires("dory-ubft/0.0.1")
         self.requires("lyra/1.5.1")
 
@@ -62,6 +65,7 @@ class DoryUbftApps(ConanFile):
             "dory-compiler-options"
         ].module.lto_decision(cmake, self.options.lto)
         cmake.definitions["DORY_LTO"] = str(lto_decision).upper()
+        cmake.definitions["WITH_MU"] = self.options.with_mu
         cmake.definitions["SPDLOG_ACTIVE_LEVEL"] = "SPDLOG_LEVEL_{}".format(
             self.options.log_level
         )
