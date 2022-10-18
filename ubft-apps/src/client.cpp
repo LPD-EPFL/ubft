@@ -41,6 +41,7 @@ int main(int argc, char *argv[]) {
   std::string app_config;
   bool check_flip = false;
   bool fast_path = false;
+  bool dump_all_percentiles = false;
 
   cli.add_argument(lyra::help(get_help))
       .add_argument(lyra::opt(local_id, "id")
@@ -61,6 +62,9 @@ int main(int argc, char *argv[]) {
                         .name("--server-id")
                         .help("ID of server"))
 #endif
+      .add_argument(lyra::opt(dump_all_percentiles)
+                        .name("--dump-percentiles")
+                        .help("Dump all percentiles"))
       .add_argument(lyra::opt(app, "application")
                         .required()
                         .name("-a")
@@ -218,7 +222,7 @@ int main(int argc, char *argv[]) {
       rpc_client.post();
     }
   }
-  latency_profiler.report();
+  latency_profiler.report(dump_all_percentiles);
 
   return 0;
 }

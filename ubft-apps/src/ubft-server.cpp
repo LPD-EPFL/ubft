@@ -1,4 +1,6 @@
 #include <chrono>
+#include <csignal>
+#include <unistd.h>
 
 #include <lyra/lyra.hpp>
 
@@ -7,6 +9,7 @@
 
 #include <dory/shared/logger.hpp>
 #include <dory/shared/units.hpp>
+#include <dory/special/proc-mem.hpp>
 
 #include <dory/ubft/server-builder.hpp>
 
@@ -21,6 +24,12 @@ using dory::ubft::rpc::internal::RequestStateMachine;
 
 static auto main_logger = dory::std_out_logger("Init");
 
+static void signalHandler(int signum) {
+  std::cout << "Process signal (" << signum << ") received." << std::endl;
+  auto consumption = dory::special::process_memory_consumption();
+  std::cout << "Process memory consumption (in bytes):\n" << consumption.toString() << std::endl;
+}
+
 int main(int argc, char *argv[]) {
   //// Parse Arguments ////
   lyra::cli cli;
@@ -30,6 +39,7 @@ int main(int argc, char *argv[]) {
   size_t client_window = 16;
   bool optimistic_rpc = false;
   bool fast_path = false;
+  bool dump_vm_consumption = false;
   size_t consensus_window = 256;
   size_t consensus_cb_tail = 128;
   size_t consensus_batch_size = 16;
@@ -68,6 +78,9 @@ int main(int argc, char *argv[]) {
                         .name("-f")
                         .name("--consensus-fast-path")
                         .help("Enable consensus' fast path"))
+      .add_argument(lyra::opt(dump_vm_consumption)
+                        .name("--dump-vm-consumption")
+                        .help("Dump the memory consumption"))
       .add_argument(lyra::opt(consensus_window, "consensus_window")
                         .name("-W")
                         .name("--consensus-window")
@@ -93,6 +106,11 @@ int main(int argc, char *argv[]) {
     std::cerr << "Error in command line: " << result.errorMessage()
               << std::endl;
     return 1;
+  }
+
+  if (dump_vm_consumption) {
+    signal(SIGUSR1, signalHandler);
+    std::cout << "PID" << getpid() << "PID" <<std::endl;
   }
 
   //// Initialize the crypto library ////
