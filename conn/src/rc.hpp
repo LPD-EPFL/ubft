@@ -134,6 +134,27 @@ class ReliableConnection {
                          uint64_t expected, uint64_t swap,
                          bool signaled = true);
 
+  /**
+   * @brief Posts a send request.
+   *
+   * The buffer must lie within the MR given at construction time.
+   */
+  bool postSendSingleSend(uint64_t req_id, void *buf, uint32_t len,
+                          std::optional<uint32_t> immediate = std::nullopt,
+                          bool signaled = true);
+
+  /**
+   * @brief Posts `number` recv requests.
+   *
+   * NOT THREAD-SAFE AS IT REUSES PRE-ALLOCATED BUFFERS.
+   *
+   * The buffers must lie within the MR given at construction time.
+   * All the RECV will have the same `len`.
+   * The req ids will span [base_req_id, base_req_id+number).
+   */
+  bool postRecvMany(uint64_t base_req_id, void **bufs, size_t number,
+                    uint32_t len);
+
   bool pollCqIsOk(Cq cq, std::vector<struct ibv_wc> &entries) const;
 
   RemoteConnection remoteInfo() const;
@@ -179,6 +200,9 @@ class ReliableConnection {
   RemoteConnection rconn;
   ctrl::ControlBlock::MemoryRights init_rights;
   deleted_unique_ptr<struct ibv_send_wr> wr_cached;
+
+  std::vector<struct ibv_recv_wr> recv_wr_cached;
+  std::vector<struct ibv_sge> recv_sg_cached;
 
   LOGGER_DECL(logger);
 };

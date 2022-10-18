@@ -157,8 +157,11 @@ class Buffer {
  *
  */
 class Pool {
+  static bool constexpr AllowDelayedBufferAlloc = true;
+
  public:
-  Pool(size_t const nb_buffers, size_t const buffer_size) {
+  Pool(size_t const nb_buffers, size_t const buffer_size)
+      : buffer_size{buffer_size} {
     buffers->reserve(nb_buffers);
     for (size_t i = 0; i < nb_buffers; i++) {
       buffers->emplace_back(buffer_size);
@@ -168,7 +171,10 @@ class Pool {
   std::optional<Buffer> take(
       std::optional<size_t> const opt_size = std::nullopt) {
     if (unlikely(buffers->empty())) {
-      return std::nullopt;
+      if constexpr (!AllowDelayedBufferAlloc) {
+        return std::nullopt;
+      }
+      buffers->emplace_back(buffer_size);
     }
     auto buffer = std::move(buffers->back());
     buffers->pop_back();
@@ -181,7 +187,10 @@ class Pool {
 
   std::optional<std::reference_wrapper<Buffer>> borrowNext() {
     if (unlikely(buffers->empty())) {
-      return std::nullopt;
+      if constexpr (!AllowDelayedBufferAlloc) {
+        return std::nullopt;
+      }
+      buffers->emplace_back(buffer_size);
     }
     return buffers->back();
   }
@@ -191,6 +200,7 @@ class Pool {
   // even upon move.
   std::unique_ptr<std::vector<Buffer>> buffers =
       std::make_unique<std::vector<Buffer>>();
+  size_t buffer_size;
 };
 
 }  // namespace dory::ubft

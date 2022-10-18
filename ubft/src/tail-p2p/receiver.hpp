@@ -131,8 +131,8 @@ class Receiver {
           ptr_to_scan + sizeof(Header) + size);
       auto *byte_buffer = reinterpret_cast<uint8_t *>(buffer);
       // memcpy does not work with volatile pointers.
-      // instead, we use the modern std::copy(beginning, end, dest)
-      std::copy(data_beginning, data_end, byte_buffer);
+      // Discarding the volatile qualifier should be safe here, to check.
+      std::memcpy(byte_buffer, const_cast<uint8_t *>(data_beginning), size);
 
       // Ensures that the incarnation number is read after the (hash, size,
       // data).

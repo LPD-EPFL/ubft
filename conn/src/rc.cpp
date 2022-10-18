@@ -385,6 +385,66 @@ bool ReliableConnection::postSendSingleCas(uint64_t req_id, void *buf,
   return postSend(wr);
 }
 
+bool ReliableConnection::postSendSingleSend(
+    uint64_t const req_id, void *const buf, uint32_t const len,
+    std::optional<uint32_t> const immediate, bool const signaled) {
+  struct ibv_sge sg = {};
+  sg.addr = reinterpret_cast<uint64_t>(buf);
+  sg.length = len;
+  sg.lkey = mr.lkey;
+
+  struct ibv_send_wr wr = {};
+  wr.wr_id = req_id;
+  wr.sg_list = &sg;
+  wr.num_sge = 1;
+  wr.opcode = immediate ? IBV_WR_SEND_WITH_IMM : IBV_WR_SEND;
+  if (immediate) {
+    wr.imm_data = *immediate;
+  }
+  wr.send_flags = (signaled ? IBV_SEND_SIGNALED : 0) |
+                  (len > MaxInlining ? 0 : IBV_SEND_INLINE);
+
+  return postSend(wr);
+}
+
+bool ReliableConnection::postRecvMany(uint64_t base_req_id, void **bufs,
+                                      size_t number, uint32_t len) {
+  recv_wr_cached.reserve(number);
+  recv_sg_cached.reserve(number);
+
+  for (size_t r = 0; r < number; r++) {
+    auto &sg = recv_sg_cached[r];
+    sg = {};
+    sg.addr = reinterpret_cast<uint64_t>(bufs[r]);
+    sg.length = len;
+    sg.lkey = mr.lkey;
+
+    auto &wr = recv_wr_cached[r];
+    wr = {};
+    wr.wr_id = base_req_id + r;
+    wr.sg_list = &sg;
+    wr.num_sge = 1;
+    wr.next = (r == number - 1) ? nullptr : &recv_wr_cached[r + 1];
+  }
+
+  struct ibv_recv_wr *bad_wr = nullptr;
+
+  int rc = ibv_post_recv(uniq_qp.get(), &recv_wr_cached[0], &bad_wr);
+
+  if (bad_wr != nullptr) {
+    LOGGER_DEBUG(logger, "Got bad wr with id: {}", bad_wr->wr_id);
+    return false;
+  }
+
+  if (rc != 0) {
+    throw std::runtime_error(
+        "Error due to driver misuse during posting a RECV: " +
+        std::string(std::strerror(rc)));
+  }
+
+  return true;
+}
+
 void ReliableConnection::reconnect() { connect(rconn, proc_id); }
 
 bool ReliableConnection::pollCqIsOk(Cq cq,
