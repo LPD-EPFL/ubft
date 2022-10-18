@@ -134,7 +134,7 @@ class LatencyProfiler {
     }
   }
 
-  void report() {
+  void report(bool detailed = false) {
     std::cout << "Skipping " << skip << " initial measurements"
               << "\n";
 
@@ -153,11 +153,18 @@ class LatencyProfiler {
                 << ", " << prettyTime(g.end) << "): " << meas_cnt << "\n";
     }
 
-    std::cout << "50th-percentile (ns): " << percentile(50.0).count() << "\n"
-              << "90th-percentile (ns): " << percentile(90.0).count() << "\n"
-              << "95th-percentile (ns): " << percentile(95.0).count() << "\n"
-              << "98th-percentile (ns): " << percentile(98.0).count() << "\n"
-              << "99th-percentile (ns): " << percentile(99.0).count() << "\n"
+    if (detailed) {
+      for (int i = 0; i < 99; i++) {
+        std::cout << i << "th-percentile (ns): "
+                  << percentile(static_cast<double>(i)).count() << "\n";
+      }
+    } else {
+      std::cout << "50th-percentile (ns): " << percentile(50.0).count() << "\n"
+                << "90th-percentile (ns): " << percentile(90.0).count() << "\n"
+                << "95th-percentile (ns): " << percentile(95.0).count() << "\n"
+                << "98th-percentile (ns): " << percentile(98.0).count() << "\n";
+    }
+    std::cout << "99th-percentile (ns): " << percentile(99.0).count() << "\n"
               << "99.5th-percentile (ns): " << percentile(99.5).count() << "\n"
               << "99.9th-percentile (ns): " << percentile(99.9).count() << "\n"
               << "99.99th-percentile (ns): " << percentile(99.99).count()
