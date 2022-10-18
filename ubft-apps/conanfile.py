@@ -47,6 +47,7 @@ class DoryUbftApps(ConanFile):
         self.requires("dory-shared/0.0.1")
         self.requires("dory-extern/0.0.1")
         self.requires("dory-rpc/0.0.1")
+        self.requires("dory-special/0.0.1")
         self.requires("dory-third-party/0.0.1")
         if self.options.with_mu:
             self.requires("dory-crash-consensus/0.0.1")
