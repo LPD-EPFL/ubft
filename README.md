@@ -1,6 +1,5 @@
-![alt text](logo/ubft-logo.png "uBFT")
-### Microsecond-scale BFT using Disaggregated Memory
-Check out our [ASPLOS paper]() for more details!
+## Microsecond-scale BFT using Disaggregated Memory
+Check out our [ASPLOS paper](https://arxiv.org/abs/2210.17174v2) for more details!
 
 ## Build Requirements
 
