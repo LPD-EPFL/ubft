@@ -13,5 +13,5 @@ special : [third-party, shared]
 memory : [special, shared]
 rpc : [shared]
 
-ubft : [shared, crypto, ctrl, conn, extern, memstore, third-party, rpc]
+ubft : [shared, crypto, pony, ctrl, conn, extern, memstore, third-party, rpc]
 ubft-apps : [shared, memstore, ctrl, rpc, third-party, crash-consensus, ubft, special]

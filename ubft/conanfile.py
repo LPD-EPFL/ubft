@@ -47,6 +47,7 @@ class DoryUbftConan(ConanFile):
         self.requires("dory-rpc/0.0.1")
         self.requires("dory-third-party/0.0.1")
         self.requires("dory-crypto/0.0.1")
+        self.requires("dory-pony/0.0.1")
         # self.requires("dory-crash-consensus/0.0.1")
         self.requires("lyra/1.5.1")
         self.requires("xxhash/0.8.0")
