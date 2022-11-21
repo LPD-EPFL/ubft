@@ -2,6 +2,7 @@ shared : []
 extern : []
 third-party : []
 crash-consensus : []
+pony: []
 
 memstore : [shared, extern]
 
