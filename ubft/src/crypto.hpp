@@ -2,49 +2,39 @@
 
 #include <cstdint>
 #include <stdexcept>
-#include <unordered_map>
+#include <set>
 
 #include <fmt/core.h>
 
 #include <dory/memstore/store.hpp>
+#include <dory/pony/pony.hpp>
 
 #include "types.hpp"
-
-// Use Dalek or Sodium
-#include <dory/crypto/asymmetric/dalek.hpp>
-#define crypto_impl dory::crypto::asymmetric::dalek
-
-// #include <dory/crypto/asymmetric/sodium.hpp>
-// #define crypto_impl dory::crypto::asymmetric::sodium
 
 namespace dory::ubft {
 class Crypto {
  public:
-  using Signature = std::array<uint8_t, crypto_impl::SignatureLength>;
+  using Signature = dory::pony::Signature;
 
   Crypto(ProcId local_id, std::vector<ProcId> const &all_ids)
-      : my_id{local_id} {
+      : my_id{local_id}, ponylib{my_id} {
     auto &store = dory::memstore::MemoryStore::getInstance();
-    crypto_impl::init();
-    crypto_impl::publish_pub_key(fmt::format("{}-pubkey", local_id));
-    store.barrier("public_keys_announced", all_ids.size());
+    store.barrier("server_public_keys_announced", all_ids.size());
 
     for (auto id : all_ids) {
-      public_keys.emplace(
-          id, crypto_impl::get_public_key(fmt::format("{}-pubkey", id)));
+      public_keys.insert(id);
     }
   }
 
   // WARNING: THIS IS NOT THREAD SAFE
   void fetchPublicKey(ProcId const id) {
-    public_keys.emplace(
-        id, crypto_impl::get_public_key(fmt::format("{}-pubkey", id)));
+    throw std::logic_error("Unimplemented `fetchPublicKey`!");
   }
 
   inline Signature sign(uint8_t const *msg,      // NOLINT
                         size_t const msg_len) {  // NOLINT
     Signature sig;
-    crypto_impl::sign(sig.data(), msg, msg_len);
+    ponylib.sign(sig, msg, msg_len);
     return sig;
   }
 
@@ -56,7 +46,7 @@ class Crypto {
           fmt::format("Missing public key for {}!", node_id));
     }
 
-    return crypto_impl::verify(sig.data(), msg, msg_len, pk_it->second);
+    return ponylib.verify(sig.data(), msg, msg_len, node_id);
   }
 
   inline ProcId myId() const { return my_id; }
@@ -64,6 +54,7 @@ class Crypto {
  private:
   ProcId const my_id;
   // Map: NodeId (ProcId) -> Node's Public Key
-  std::unordered_map<ProcId, crypto_impl::pub_key> public_keys;
+  std::set<ProcId> public_keys;
+  pony::PonyLib ponylib;
 };
 }  // namespace dory::ubft
