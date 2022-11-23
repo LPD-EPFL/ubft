@@ -119,15 +119,15 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  //// Initialize the crypto library ////
+  dory::ubft::Crypto crypto(local_id, all_ids);
+
   //// Pinning to the isolated core ////
   if (pinned_core_id) {
     LOGGER_INFO(main_logger, "Pinning the main thread to core {}",
                 *pinned_core_id);
     dory::pin_main_to_core(*pinned_core_id);
   }
-
-  //// Initialize the crypto library ////
-  dory::ubft::Crypto crypto(local_id, all_ids);
 
   //// Initialize the thread pool ////
   dory::ubft::TailThreadPool thread_pool("consensus-pool", tp_threads,
