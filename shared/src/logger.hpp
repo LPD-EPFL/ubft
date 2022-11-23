@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "unused-suppressor.hpp"
+#include "internal/unused.hpp"
 
 #ifndef CLANG_TIDIER
 #ifndef SPDLOG_ACTIVE_LEVEL
@@ -24,7 +24,7 @@ logger std_out_logger(std::string const &prefix);
 #define LOGGER_TRACE(...) SPDLOG_LOGGER_TRACE(__VA_ARGS__)
 #define LOGGER_TRACE_ACTIVE
 #else
-#define LOGGER_TRACE(...) dory::ignore(__VA_ARGS__)
+#define LOGGER_TRACE(...) DORY_ALL_UNUSED(__VA_ARGS__)
 #ifdef LOGGER_TRACE_ACTIVE
 #undef LOGGER_TRACE_ACTIVE
 #endif
@@ -34,7 +34,7 @@ logger std_out_logger(std::string const &prefix);
 #define LOGGER_DEBUG(...) SPDLOG_LOGGER_DEBUG(__VA_ARGS__)
 #define LOGGER_DEBUG_ACTIVE
 #else
-#define LOGGER_DEBUG(...) dory::ignore(__VA_ARGS__)
+#define LOGGER_DEBUG(...) DORY_ALL_UNUSED(__VA_ARGS__)
 #ifdef LOGGER_DEBUG_ACTIVE
 #undef LOGGER_DEBUG_ACTIVE
 #endif
@@ -44,7 +44,7 @@ logger std_out_logger(std::string const &prefix);
 #define LOGGER_INFO(...) SPDLOG_LOGGER_INFO(__VA_ARGS__)
 #define LOGGER_INFO_ACTIVE
 #else
-#define LOGGER_INFO(...) dory::ignore(__VA_ARGS__)
+#define LOGGER_INFO(...) DORY_ALL_UNUSED(__VA_ARGS__)
 #ifdef LOGGER_INFO_ACTIVE
 #undef LOGGER_INFO_ACTIVE
 #endif
@@ -54,7 +54,7 @@ logger std_out_logger(std::string const &prefix);
 #define LOGGER_WARN(...) SPDLOG_LOGGER_WARN(__VA_ARGS__)
 #define LOGGER_WARN_ACTIVE
 #else
-#define LOGGER_WARN(...) dory::ignore(__VA_ARGS__)
+#define LOGGER_WARN(...) DORY_ALL_UNUSED(__VA_ARGS__)
 #ifdef LOGGER_WARN_ACTIVE
 #undef LOGGER_WARN_ACTIVE
 #endif
@@ -64,7 +64,7 @@ logger std_out_logger(std::string const &prefix);
 #define LOGGER_ERROR(...) SPDLOG_LOGGER_ERROR(__VA_ARGS__)
 #define LOGGER_ERROR_ACTIVE
 #else
-#define LOGGER_ERROR(...) dory::ignore(__VA_ARGS__)
+#define LOGGER_ERROR(...) DORY_ALL_UNUSED(__VA_ARGS__)
 #ifdef LOGGER_ERROR_ACTIVE
 #undef LOGGER_ERROR_ACTIVE
 #endif
@@ -74,7 +74,7 @@ logger std_out_logger(std::string const &prefix);
 #define LOGGER_CRITICAL(...) SPDLOG_LOGGER_CRITICAL(__VA_ARGS__)
 #define LOGGER_CRITICAL_ACTIVE
 #else
-#define LOGGER_CRITICAL(...) dory::ignore(__VA_ARGS__)
+#define LOGGER_CRITICAL(...) DORY_ALL_UNUSED(__VA_ARGS__)
 #ifdef LOGGER_CRITICAL_ACTIVE
 #undef LOGGER_CRITICAL_ACTIVE
 #endif
